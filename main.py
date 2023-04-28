@@ -45,10 +45,10 @@ def draw_step_by_step(x1, y1, x2, y2):
         x = x + dx
     end = time.time()
 
-    draw_graph(img, 0, 0, 'Алгоритм ЦДА')
+    draw_graph(img, 0, 0, 'Пошаговый алгоритм')
 
     print('Time spent: {}'.format(end - begin))
-    return 'Time spent: {}'.format(end - begin)
+    return 'Пошаговый алгоритм: {}s'.format(end - begin)
 
 
 def draw_dda(x1, y1, x2, y2):
@@ -72,7 +72,7 @@ def draw_dda(x1, y1, x2, y2):
     draw_graph(img, 0, 1, 'Алгоритм ЦДА')
 
     print('Time spent: {}'.format(end - begin))
-    return 'Time spent: {}'.format(end - begin)
+    return 'Алгоритм ЦДА: {}s'.format(end - begin)
 
 
 def draw_bresenham(x1, y1, x2, y2):
@@ -101,26 +101,29 @@ def draw_bresenham(x1, y1, x2, y2):
     draw_graph(img, 1, 0, 'Алгоритм Брезенхема')
 
     print('Time spent: {}'.format(end - begin))
-    return 'Time spent: {}'.format(end - begin)
+    return 'Алгоритм Брезенхема: {}s'.format(end - begin)
 
 
 def draw_circle_bresenham(xc, yc, r):
     x = 0
     y = r
     d = 3 - 2 * r
+    xc = r + 2
+    yc = r + 2
+    S = 2 * r + 4
 
-    img = np.zeros((2 * SIZE, 2 * SIZE))
+    img = np.zeros((2 * S, 2 * S))
     begin = time.time()
 
     while y >= x:
-        img[SIZE + xc + x, SIZE + yc + y] = 1
-        img[SIZE + xc + x, SIZE + yc - y] = 1
-        img[SIZE + xc - x, SIZE + yc + y] = 1
-        img[SIZE + xc - x, SIZE + yc - y] = 1
-        img[SIZE + xc + y, SIZE + yc + x] = 1
-        img[SIZE + xc + y, SIZE + yc - x] = 1
-        img[SIZE + xc - y, SIZE + yc + x] = 1
-        img[SIZE + xc - y, SIZE + yc - x] = 1
+        img[S - xc + x, S - yc + y] = 1
+        img[S - xc + x, S - yc - y] = 1
+        img[S - xc - x, S - yc + y] = 1
+        img[S - xc - x, S - yc - y] = 1
+        img[S - xc + y, S - yc + x] = 1
+        img[S - xc + y, S - yc - x] = 1
+        img[S - xc - y, S - yc + x] = 1
+        img[S - xc - y, S - yc - x] = 1
         x += 1
         if d > 0:
             y -= 1
@@ -129,9 +132,9 @@ def draw_circle_bresenham(xc, yc, r):
             d = d + 4 * x + 6
     end = time.time()
 
-    draw_circle_graph(img, 1, 1, 'Алгоритм Брезенхема(для окружности)')
+    draw_circle_graph(img, 1, 1, 'Алгоритм Брезенхема(для окружности)', S)
     print('Time spent: {}'.format(end - begin))
-    return 'Time spent: {}'.format(end - begin)
+    return 'Алгоритм Брезенхема(для окружности): {}s'.format(end - begin)
 
 
 def draw_graph(img, row, column, title):
@@ -145,12 +148,12 @@ def draw_graph(img, row, column, title):
 
     ax[row, column].imshow(img,  cmap='binary')
 
-def draw_circle_graph(img, row, column, title):
-    ax[row, column].set_xlim([0, 2 * SIZE])
-    ax[row, column].set_ylim([0, 2 * SIZE])
+def draw_circle_graph(img, row, column, title, S):
+    ax[row, column].set_xlim([0, S])
+    ax[row, column].set_ylim([0, S])
     ax[row, column].set_title(title)
-    ax[row, column].set_xticks([i for i in range(0, 2 * SIZE, SIZE // 10)])
-    ax[row, column].set_yticks([i for i in range(0, 2 * SIZE, SIZE // 10)])
+    ax[row, column].set_xticks([i for i in range(0, S, S // 10)])
+    ax[row, column].set_yticks([i for i in range(0, S, S // 10)])
     ax[row, column].grid(True)
     f.show()
     ax[row, column].imshow(img,  cmap='binary')
@@ -167,15 +170,14 @@ def ok_button_click():
 
         if not all(isinstance(val, (int, float)) for val in (x1, y1, x2, y2, scale, radius)):
             raise ValueError("Все значения должны быть числами")
-        scale = max(x2, y2) + 4
+        scale = max(x2, y2, x1, y1) + 4
 
-        if not all(val < scale for val in (x1, y1, x2, y2, radius)):
+        if not all(val < scale for val in (x1, y1, x2, y2)):
             raise ValueError("Значения должны быть меньше scale")
                 
-        if x1 > x2:
+        if x1 > x2 or y1 > y2:
             x1, x2 = x2, x1
-
-        if y1 > y2:
+        
             y1, y2 = y2, y1
 
         SIZE = int(scale)
